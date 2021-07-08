@@ -1,9 +1,8 @@
 import Script from "next/script";
 import { useState } from "react";
 
+import { eventsToWeekTotal, getWeekEvents } from "../data/calendar";
 import { fb } from "../modules/auth";
-
-declare var gapi: any;
 
 export default function Home() {
   const [isSignedIn, setIsSignedIn] = useState(false); // Local signed-in state.
@@ -27,7 +26,7 @@ export default function Home() {
       });
 
       const GoogleAuth = gapi.auth2.getAuthInstance();
-      setIsSignedIn(GoogleAuth.isSignedIn);
+      setIsSignedIn(GoogleAuth.isSignedIn.get());
 
       gapi.client.load("calendar", "v3", () => console.log("loaded calendar"));
     });
@@ -52,15 +51,11 @@ export default function Home() {
   };
 
   const getCalendar = async () => {
-    const events = await gapi.client.calendar.events.list({
-      calendarId: "sephereus9@gmail.com",
-      timeMin: new Date().toISOString(),
-      showDeleted: false,
-      singleEvents: true,
-      maxResults: 10,
-      orderBy: "startTime",
-    });
+    const events = await getWeekEvents(new Date());
     console.log("events: ", events);
+
+    const weekTotal = eventsToWeekTotal(events);
+    console.log("weekTotal: ", weekTotal);
   };
 
   return (

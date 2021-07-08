@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "date-fns": "^2.22.1",
     "firebase": "^8.6.8",
     "next": "11.0.1",
     "react": "17.0.2",
@@ -16,6 +17,9 @@
     "react-firebaseui": "^5.0.2"
   },
   "devDependencies": {
+    "@types/gapi": "^0.0.40",
+    "@types/gapi.auth2": "^0.0.55",
+    "@types/gapi.calendar": "^3.0.4",
     "@types/react": "17.0.11",
     "eslint": "7.29.0",
     "eslint-config-next": "11.0.1",
