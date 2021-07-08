@@ -1,22 +1,9 @@
 import Script from "next/script";
-import { useEffect, useState } from "react";
-import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
+import { useState } from "react";
 
 import { fb } from "../modules/auth";
 
 declare var gapi: any;
-
-const uiConfig: firebaseui.auth.Config = {
-  // Redirect to /signedIn after sign in is successful. Alternatively you can provide a callbacks.signInSuccess function.
-  signInSuccessUrl: "/signedIn",
-  // We will display Google and Facebook as auth providers.
-  signInOptions: [fb.auth.GoogleAuthProvider.PROVIDER_ID],
-  callbacks: {
-    signInSuccessWithAuthResult: () => false,
-  },
-  tosUrl: "/terms-and-serice-url",
-  privacyPolicyUrl: "/privacy-policy-url",
-};
 
 export default function Home() {
   const [isSignedIn, setIsSignedIn] = useState(false); // Local signed-in state.
@@ -50,10 +37,11 @@ export default function Home() {
     const googleAuth = gapi.auth2.getAuthInstance();
     const googleUser = await googleAuth.signIn();
 
+    // connect to firebase
     const token = googleUser.getAuthResponse().id_token;
-
     const credential = fb.auth.GoogleAuthProvider.credential(token);
     await fb.auth().signInWithCredential(credential);
+
     setIsSignedIn(true);
   };
 
@@ -79,14 +67,16 @@ export default function Home() {
     <div>
       <Script src="https://apis.google.com/js/api.js" onLoad={initGapi} />
 
-      {isSignedIn ? (
-        <div>
-          <div>{fb.auth().currentUser?.displayName}</div>
-          <a onClick={signOut}>Sign-out</a>
-        </div>
-      ) : (
-        <button onClick={signIn}>sign in</button>
-      )}
+      <div>
+        {isSignedIn ? (
+          <div>
+            <div>{fb.auth().currentUser?.displayName}</div>
+            <button onClick={signOut}>Sign-out</button>
+          </div>
+        ) : (
+          <button onClick={signIn}>sign in</button>
+        )}
+      </div>
 
       <button onClick={getCalendar}>get calendar</button>
     </div>
