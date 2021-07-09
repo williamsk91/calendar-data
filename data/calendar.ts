@@ -47,7 +47,7 @@ const calcDuration = (event: GEvent): number =>
 
 const isRecurring = (event: GEvent): boolean => !!event.recurringEventId;
 
-interface WeekTotal {
+export interface WeekTotal {
   tag: string;
   recurring: number;
   oneOff: number;

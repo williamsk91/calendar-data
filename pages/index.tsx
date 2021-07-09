@@ -1,7 +1,8 @@
 import Script from "next/script";
 import { useState } from "react";
 
-import { eventsToWeekTotal, getWeekEvents } from "../data/calendar";
+import { WeekTotalChart } from "../component/WeekTotalChart";
+import { WeekTotal, eventsToWeekTotal, getWeekEvents } from "../data/calendar";
 import { fb } from "../modules/auth";
 
 export default function Home() {
@@ -50,12 +51,15 @@ export default function Home() {
     setIsSignedIn(false);
   };
 
+  const [weekTotal, setWeekTotal] = useState<WeekTotal[]>([]);
+
   const getCalendar = async () => {
     const events = await getWeekEvents(new Date());
     console.log("events: ", events);
 
     const weekTotal = eventsToWeekTotal(events);
     console.log("weekTotal: ", weekTotal);
+    setWeekTotal(weekTotal);
   };
 
   return (
@@ -74,6 +78,8 @@ export default function Home() {
       </div>
 
       <button onClick={getCalendar}>get calendar</button>
+
+      <WeekTotalChart data={weekTotal} />
     </div>
   );
 }
