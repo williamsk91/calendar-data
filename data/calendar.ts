@@ -45,28 +45,38 @@ const calcDuration = (event: GEvent): number =>
     new Date(event.start.dateTime || new Date())
   );
 
+const isRecurring = (event: GEvent): boolean => !!event.recurringEventId;
+
 interface WeekTotal {
   tag: string;
-  hours: number;
+  recurring: number;
+  oneOff: number;
+  total: number;
 }
 
 export const eventsToWeekTotal = (events: GEvent[]): WeekTotal[] => {
-  const bins: Record<string, number> = {};
+  const bins: Record<string, { recurring: number; oneOff: number }> = {};
 
   events.forEach((e) => {
     const tag = extractTag(e);
     if (!tag) return;
     const duration = calcDuration(e);
+    const key = isRecurring(e) ? "recurring" : "oneOff";
 
-    if (bins[tag.title]) {
-      bins[tag.title] += duration;
-    } else {
-      bins[tag.title] = duration;
+    if (!bins[tag.title]) {
+      bins[tag.title] = {
+        recurring: 0,
+        oneOff: 0,
+      };
     }
+    bins[tag.title][key] += duration;
   });
 
-  return Object.entries(bins).map(([k, v]) => ({
-    tag: k,
-    hours: v,
-  }));
+  return Object.entries(bins).map(([tag, e]) => {
+    return {
+      tag,
+      ...e,
+      total: (e.recurring || 0) + (e.oneOff || 0),
+    };
+  });
 };
