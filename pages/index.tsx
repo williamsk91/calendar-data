@@ -1,5 +1,6 @@
 import Script from "next/script";
 import { useState } from "react";
+import styled from "styled-components";
 
 import { WeekTotalChart } from "../component/WeekTotalChart";
 import { WeekTotal, eventsToWeekTotal, getWeekEvents } from "../data/calendar";
@@ -63,7 +64,7 @@ export default function Home() {
   };
 
   return (
-    <div>
+    <Layout>
       <Script src="https://apis.google.com/js/api.js" onLoad={initGapi} />
 
       <div>
@@ -80,6 +81,22 @@ export default function Home() {
       <button onClick={getCalendar}>get calendar</button>
 
       <WeekTotalChart data={weekTotal} />
-    </div>
+
+      <Label>Weekly Hours</Label>
+    </Layout>
   );
 }
+
+const Layout = styled.div`
+  max-width: 960px;
+  margin: 60px auto;
+  padding: 60px;
+  box-sizing: border-box;
+`;
+
+// Typography
+const H1 = styled.h1``;
+const H2 = styled.h2``;
+const H3 = styled.h3``;
+const Label = styled.span``;
+const p = styled.h3``;
