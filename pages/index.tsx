@@ -2,8 +2,16 @@ import Script from "next/script";
 import { useState } from "react";
 import styled from "styled-components";
 
+import { TagPercentageChart } from "../component/TagPercentageChart";
 import { WeekTotalChart } from "../component/WeekTotalChart";
-import { WeekTotal, eventsToWeekTotal, getWeekEvents } from "../data/calendar";
+import {
+  TagPercentage,
+  WeekTotal,
+  eventsToWeekTotal,
+  getRangeEvents,
+  weekTotalToTagPercentage,
+} from "../data/calendar";
+import { getCurrentWeekRange } from "../data/date";
 import { fb } from "../modules/auth";
 
 export default function Home() {
@@ -53,14 +61,21 @@ export default function Home() {
   };
 
   const [weekTotal, setWeekTotal] = useState<WeekTotal[]>([]);
+  const [tagPercentage, setTagPercentage] = useState<TagPercentage[]>([]);
 
   const getCalendar = async () => {
-    const events = await getWeekEvents(new Date());
+    const weekRange = getCurrentWeekRange();
+    console.log("weekRange: ", weekRange);
+    const events = await getRangeEvents(weekRange[0], weekRange[1]);
     console.log("events: ", events);
 
     const weekTotal = eventsToWeekTotal(events);
     console.log("weekTotal: ", weekTotal);
     setWeekTotal(weekTotal);
+
+    const tagPercentage = weekTotalToTagPercentage(weekTotal);
+    console.log("tagPercentage: ", tagPercentage);
+    setTagPercentage(tagPercentage);
   };
 
   return (
@@ -80,9 +95,9 @@ export default function Home() {
 
       <button onClick={getCalendar}>get calendar</button>
 
-      <WeekTotalChart data={weekTotal} />
-
       <Label>Weekly Hours</Label>
+      <WeekTotalChart data={weekTotal} />
+      <TagPercentageChart data={tagPercentage} />
     </Layout>
   );
 }
