@@ -1,13 +1,17 @@
 import Script from "next/script";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 
+import { CalendarInfo, CalendarList } from "../component/CalendarList";
 import { TagPercentageChart } from "../component/TagPercentageChart";
 import { WeekTotalChart } from "../component/WeekTotalChart";
 import {
   TagPercentage,
   WeekTotal,
+  calendarListEntryToCalendar,
   eventsToWeekTotal,
+  getCalendarLists,
+  getMultipleRangeEvents,
   getRangeEvents,
   weekTotalToTagPercentage,
 } from "../data/calendar";
@@ -17,12 +21,12 @@ import { fb } from "../modules/auth";
 export default function Home() {
   const [isSignedIn, setIsSignedIn] = useState(false); // Local signed-in state.
 
+  const [calendarsInfo, setCalendarsInfo] = useState<CalendarInfo[]>([]);
+  const [selectedCalendar, setSelectedCalendar] = useState<string[]>([]);
+
   // 1. Load the JavaScript client library.
   const initGapi = () => {
-    console.log("init");
     gapi.load("client", async () => {
-      console.log("loaded client");
-
       await gapi.client.init({
         apiKey: "AIzaSyAdGYvQXLRPqEqbAd9MZO8yt_K98Z-KvDg",
         // Your API key will be automatically added to the Discovery Document URLs.
@@ -38,9 +42,15 @@ export default function Home() {
       const GoogleAuth = gapi.auth2.getAuthInstance();
       setIsSignedIn(GoogleAuth.isSignedIn.get());
 
-      gapi.client.load("calendar", "v3", () => console.log("loaded calendar"));
+      gapi.client.load("calendar", "v3", () => {
+        console.log("loaded calendar");
+      });
     });
   };
+
+  useEffect(() => {
+    isSignedIn && getUserCalendarList();
+  }, [isSignedIn]);
 
   const signIn = async () => {
     const googleAuth = gapi.auth2.getAuthInstance();
@@ -58,23 +68,35 @@ export default function Home() {
     const googleAuth = gapi.auth2.getAuthInstance();
     await googleAuth.signOut();
     setIsSignedIn(false);
+    setCalendarsInfo([]);
+    setSelectedCalendar([]);
+
+    setWeekTotal([]);
+    setTagPercentage([]);
   };
 
   const [weekTotal, setWeekTotal] = useState<WeekTotal[]>([]);
   const [tagPercentage, setTagPercentage] = useState<TagPercentage[]>([]);
 
+  const getUserCalendarList = async () => {
+    const calList = await getCalendarLists();
+    const calInfos = calList.map(calendarListEntryToCalendar);
+    setCalendarsInfo(calInfos);
+    setSelectedCalendar(calInfos.map((ci) => ci.id));
+  };
+
   const getCalendar = async () => {
     const weekRange = getCurrentWeekRange();
-    console.log("weekRange: ", weekRange);
-    const events = await getRangeEvents(weekRange[0], weekRange[1]);
-    console.log("events: ", events);
+    const events = await getMultipleRangeEvents(
+      selectedCalendar,
+      weekRange[0],
+      weekRange[1]
+    );
 
     const weekTotal = eventsToWeekTotal(events);
-    console.log("weekTotal: ", weekTotal);
     setWeekTotal(weekTotal);
 
     const tagPercentage = weekTotalToTagPercentage(weekTotal);
-    console.log("tagPercentage: ", tagPercentage);
     setTagPercentage(tagPercentage);
   };
 
@@ -93,8 +115,16 @@ export default function Home() {
         )}
       </div>
 
-      <button onClick={getCalendar}>get calendar</button>
+      <CalendarList
+        calendars={calendarsInfo}
+        selected={selectedCalendar}
+        onChange={(newValue) => {
+          setSelectedCalendar(newValue);
+        }}
+      />
 
+      <button onClick={getCalendar}>get calendar</button>
+      <br />
       <Label>Weekly Hours</Label>
       <WeekTotalChart data={weekTotal} />
       <TagPercentageChart data={tagPercentage} />

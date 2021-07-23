@@ -1,23 +1,36 @@
-import { differenceInHours } from "date-fns";
+import { differenceInMinutes } from "date-fns";
 
+import { CalendarInfo } from "../component/CalendarList";
 import { Tag } from "../component/Tag";
 
 type GEvent = gapi.client.calendar.Event;
+type GCalendarListEntry = gapi.client.calendar.CalendarListEntry;
 
 // ------------------------- API -------------------------
 
 export const getCalendarLists = async () => {
   const res = await gapi.client.calendar.calendarList.list();
-  console.log("res: ", res);
-  return res;
+  return res.result.items;
+};
+
+export const getMultipleRangeEvents = async (
+  ids: string[],
+  from: Date,
+  to: Date
+): Promise<GEvent[]> => {
+  const responses = await Promise.all(
+    ids.map((id) => getRangeEvents(id, from, to))
+  );
+  return responses.flatMap((res) => res);
 };
 
 export const getRangeEvents = async (
+  id: string,
   from: Date,
   to: Date
 ): Promise<GEvent[]> => {
   const res = await gapi.client.calendar.events.list({
-    calendarId: "williamsKusnandi@gmail.com",
+    calendarId: id,
     timeMin: from.toISOString(),
     timeMax: to.toISOString(),
     showDeleted: false,
@@ -25,7 +38,6 @@ export const getRangeEvents = async (
     orderBy: "startTime",
     q: "#",
   });
-
   return res.result.items;
 };
 
@@ -67,11 +79,21 @@ const extractTag = (event: GEvent): Tag | undefined => {
 
 // ------------------------- Processing -------------------------
 
+export const calendarListEntryToCalendar = (
+  calendarListEntry: GCalendarListEntry
+): CalendarInfo => {
+  const { id, summary } = calendarListEntry;
+  return {
+    id,
+    title: summary,
+  };
+};
+
 const calcDuration = (event: GEvent): number =>
-  differenceInHours(
+  differenceInMinutes(
     new Date(event.end.dateTime || new Date()),
     new Date(event.start.dateTime || new Date())
-  );
+  ) / 60;
 
 const isRecurring = (event: GEvent): boolean => !!event.recurringEventId;
 

@@ -10,8 +10,9 @@ interface Props {
 export const WeekTotalChart = (props: Props) => {
   const { data } = props;
 
+  const height = data.length * 56;
   return (
-    <div style={{ height: "240px" }}>
+    <div style={{ height: height + "px" }}>
       <ResponsiveBar
         data={data as unknown as BarDatum[]}
         indexBy="tag.title"
@@ -21,17 +22,14 @@ export const WeekTotalChart = (props: Props) => {
         layout="horizontal"
         margin={{ left: 120 }}
         enableGridY={false}
-        labelSkipWidth={1}
+        labelSkipWidth={25}
         padding={0.1}
         innerPadding={1}
-        borderRadius={4}
+        borderRadius={3}
         axisBottom={{ tickSize: 0, format: () => "" }}
         axisLeft={{
           tickSize: 0,
-          format: (v) => {
-            console.log("v: ", v);
-            return "#" + v;
-          },
+          format: (v) => "#" + v,
         }}
         theme={chartTheme}
       />

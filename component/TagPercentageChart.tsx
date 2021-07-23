@@ -11,27 +11,23 @@ interface Props {
 
 export const TagPercentageChart = (props: Props) => {
   const { data } = props;
-  console.log("data: ", data);
 
   const parsedData = tagPercentageToData(data);
-  console.log("parsedData: ", parsedData);
   const keys = Object.keys(parsedData);
-  console.log("keys: ", keys);
 
   return (
-    <div style={{ height: "60px" }}>
+    <div style={{ height: "62px" }}>
       <ResponsiveBar
         data={[parsedData] as unknown as BarDatum[]}
-        label={(d) => `${d.value}%`}
         keys={keys}
         colors={data.map((d) => d.tag.color)}
         colorBy="id"
         layout="horizontal"
         enableGridY={false}
-        labelSkipWidth={1}
+        labelSkipWidth={25}
         padding={0.1}
         innerPadding={1}
-        borderRadius={4}
+        borderRadius={3}
         axisBottom={{ tickSize: 0, format: () => "" }}
         axisLeft={{ tickSize: 0 }}
         theme={chartTheme}
