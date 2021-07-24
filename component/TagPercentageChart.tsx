@@ -50,10 +50,10 @@ type Data = Record<string, string>;
 const tagPercentageToData = (tagPercentage: TagPercentage[]): Data => {
   const data: Data = {};
 
-  const sum = tagPercentage.reduce((sum, tp) => sum + tp.total, 0);
+  const weeklyHourSum = 7 * 24;
 
   tagPercentage.forEach((tp) => {
-    data[tp.tag.title] = ((tp.total / sum) * 100).toFixed(0);
+    data[tp.tag.title] = ((tp.total / weeklyHourSum) * 100).toFixed(0);
   });
 
   return data;
