@@ -2,17 +2,18 @@ import Script from "next/script";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 
-import { CalendarInfo, CalendarList } from "../component/CalendarList";
+import { CheckboxGroup } from "../component/CheckboxGroup";
+import { Tag } from "../component/Tag";
 import { TagPercentageChart } from "../component/TagPercentageChart";
 import { WeekTotalChart } from "../component/WeekTotalChart";
 import {
+  CalendarInfo,
   TagPercentage,
   WeekTotal,
   calendarListEntryToCalendar,
   eventsToWeekTotal,
   getCalendarLists,
   getMultipleRangeEvents,
-  getRangeEvents,
   weekTotalToTagPercentage,
 } from "../data/calendar";
 import { getCurrentWeekRange } from "../data/date";
@@ -23,6 +24,9 @@ export default function Home() {
 
   const [calendarsInfo, setCalendarsInfo] = useState<CalendarInfo[]>([]);
   const [selectedCalendar, setSelectedCalendar] = useState<string[]>([]);
+
+  const [tagsInfo, setTagsInfo] = useState<Tag[]>([]);
+  const [selectedTags, setselectedTags] = useState<string[]>([]);
 
   // 1. Load the JavaScript client library.
   const initGapi = () => {
@@ -96,6 +100,10 @@ export default function Home() {
     const weekTotal = eventsToWeekTotal(events);
     setWeekTotal(weekTotal);
 
+    const tags = weekTotal.map((wt) => wt.tag);
+    setTagsInfo(tags);
+    setselectedTags(tags.map((t) => t.title));
+
     const tagPercentage = weekTotalToTagPercentage(weekTotal);
     setTagPercentage(tagPercentage);
   };
@@ -115,19 +123,27 @@ export default function Home() {
         )}
       </div>
 
-      <CalendarList
-        calendars={calendarsInfo}
+      <CheckboxGroup
+        data={calendarsInfo}
         selected={selectedCalendar}
-        onChange={(newValue) => {
-          setSelectedCalendar(newValue);
-        }}
+        onChange={setSelectedCalendar}
       />
 
       <button onClick={getCalendar}>get calendar</button>
       <br />
+      <CheckboxGroup
+        data={tagsInfo.map(({ title }) => ({ title, id: title }))}
+        selected={selectedTags}
+        onChange={setselectedTags}
+      />
+      <br />
       <Label>Weekly Hours</Label>
-      <WeekTotalChart data={weekTotal} />
-      <TagPercentageChart data={tagPercentage} />
+      <WeekTotalChart
+        data={weekTotal.filter((wt) => selectedTags.includes(wt.tag.title))}
+      />
+      <TagPercentageChart
+        data={tagPercentage.filter((wt) => selectedTags.includes(wt.tag.title))}
+      />
     </Layout>
   );
 }

@@ -1,6 +1,5 @@
 import { differenceInMinutes } from "date-fns";
 
-import { CalendarInfo } from "../component/CalendarList";
 import { Tag } from "../component/Tag";
 
 type GEvent = gapi.client.calendar.Event;
@@ -78,6 +77,11 @@ const extractTag = (event: GEvent): Tag | undefined => {
 };
 
 // ------------------------- Processing -------------------------
+
+export interface CalendarInfo {
+  id: string;
+  title: string;
+}
 
 export const calendarListEntryToCalendar = (
   calendarListEntry: GCalendarListEntry

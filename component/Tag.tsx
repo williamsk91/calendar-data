@@ -9,7 +9,7 @@ interface Props {
   tag: Tag;
 }
 
-export const Tag = (props: Props) => {
+export const TagTitle = (props: Props) => {
   const { tag } = props;
   return <ATag color={tag.color}>{tag.title}</ATag>;
 };
