@@ -5,6 +5,7 @@ import styled from "styled-components";
 import { CheckboxGroup } from "../component/CheckboxGroup";
 import { Tag } from "../component/Tag";
 import { TagPercentageChart } from "../component/TagPercentageChart";
+import { WeekPicker } from "../component/WeekPicker";
 import { WeekTotalChart } from "../component/WeekTotalChart";
 import {
   CalendarInfo,
@@ -16,11 +17,13 @@ import {
   getMultipleRangeEvents,
   weekTotalToTagPercentage,
 } from "../data/calendar";
-import { getCurrentWeekRange } from "../data/date";
+import { getWeekRange } from "../data/date";
 import { fb } from "../modules/auth";
 
 export default function Home() {
   const [isSignedIn, setIsSignedIn] = useState(false); // Local signed-in state.
+
+  const [weekRange, setWeekRange] = useState(getWeekRange());
 
   const [calendarsInfo, setCalendarsInfo] = useState<CalendarInfo[]>([]);
   const [selectedCalendar, setSelectedCalendar] = useState<string[]>([]);
@@ -90,7 +93,6 @@ export default function Home() {
   };
 
   const getCalendar = async () => {
-    const weekRange = getCurrentWeekRange();
     const events = await getMultipleRangeEvents(
       selectedCalendar,
       weekRange[0],
@@ -129,6 +131,12 @@ export default function Home() {
         onChange={setSelectedCalendar}
       />
 
+      <WeekPicker
+        week={weekRange[0]}
+        onChange={(date) => setWeekRange(getWeekRange(date))}
+      />
+
+      <br />
       <button onClick={getCalendar}>get calendar</button>
       <br />
       <CheckboxGroup

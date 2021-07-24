@@ -2,7 +2,7 @@ import { endOfWeek, startOfWeek } from "date-fns";
 
 type WeekStartsOn = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
-export const getCurrentWeekRange = (
+export const getWeekRange = (
   now: Date = new Date(),
   weekStartsOn: WeekStartsOn = 1
 ): [Date, Date] => [
