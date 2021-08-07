@@ -2,7 +2,7 @@ import { differenceInMinutes } from "date-fns";
 
 import { Tag } from "../component/Tag";
 
-type GEvent = gapi.client.calendar.Event;
+export type GEvent = gapi.client.calendar.Event;
 type GCalendarListEntry = gapi.client.calendar.CalendarListEntry;
 
 // ------------------------- API -------------------------
@@ -40,23 +40,66 @@ export const getRangeEvents = async (
   return res.result.items;
 };
 
-const GOOLGE_CALENDAR_COLORS: Record<string, string> = {
-  "0": "#039be5",
-  "1": "#7986cb",
-  "2": "#33b679",
-  "3": "#8e24aa",
-  "4": "#e67c73",
-  "5": "#f6c026",
-  "6": "#f5511d",
-  "7": "#039be5",
-  "8": "#616161",
-  "9": "#3f51b5",
-  "10": "#0b8043",
-  "11": "#d60000",
+interface COLOR {
+  background: string;
+  foreground: string;
+}
+
+/**
+ * Hardcoded data of Google calendar colors
+ *
+ * @see https://developers.google.com/calendar/api/v3/reference/colors/get
+ */
+const GOOLGE_CALENDAR_EVENT_COLORS: Record<string, COLOR> = {
+  "1": {
+    background: "#a4bdfc",
+    foreground: "#1d1d1d",
+  },
+  "2": {
+    background: "#7ae7bf",
+    foreground: "#1d1d1d",
+  },
+  "3": {
+    background: "#dbadff",
+    foreground: "#1d1d1d",
+  },
+  // 1 2
+  "4": {
+    background: "#ff887c",
+    foreground: "#1d1d1d",
+  },
+  "5": {
+    background: "#fbd75b",
+    foreground: "#1d1d1d",
+  },
+  "6": {
+    background: "#ffb878",
+    foreground: "#1d1d1d",
+  },
+  "7": {
+    background: "#46d6db",
+    foreground: "#1d1d1d",
+  },
+  "8": {
+    background: "#e1e1e1",
+    foreground: "#1d1d1d",
+  },
+  "9": {
+    background: "#5484ed",
+    foreground: "#1d1d1d",
+  },
+  "10": {
+    background: "#51b749",
+    foreground: "#1d1d1d",
+  },
+  "11": {
+    background: "#dc2127",
+    foreground: "#1d1d1d",
+  },
 };
 
-const colorIdToColor = (googleColorId: string): string =>
-  GOOLGE_CALENDAR_COLORS[googleColorId] || GOOLGE_CALENDAR_COLORS["0"];
+const colorIdToEventColor = (googleColorId?: string): string =>
+  GOOLGE_CALENDAR_EVENT_COLORS[googleColorId || "1"].background;
 
 // ------------------------- Tag -------------------------
 
@@ -68,7 +111,7 @@ const extractTag = (event: GEvent): Tag | undefined => {
   const tag = tagCandidate[1];
   if (!tag) return undefined;
 
-  const color = colorIdToColor(event.colorId || "0");
+  const color = colorIdToEventColor(event.colorId);
 
   return {
     title: tag,
@@ -81,15 +124,17 @@ const extractTag = (event: GEvent): Tag | undefined => {
 export interface CalendarInfo {
   id: string;
   title: string;
+  color: string;
 }
 
 export const calendarListEntryToCalendar = (
   calendarListEntry: GCalendarListEntry
 ): CalendarInfo => {
-  const { id, summary } = calendarListEntry;
+  const { id, summary, backgroundColor } = calendarListEntry;
   return {
     id,
     title: summary,
+    color: backgroundColor as string,
   };
 };
 

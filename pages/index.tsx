@@ -2,7 +2,9 @@ import Script from "next/script";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 
+import { AuthButton } from "../component/AuthButton";
 import { CheckboxGroup } from "../component/CheckboxGroup";
+import { RefreshButton } from "../component/RefreshButton";
 import { Tag } from "../component/Tag";
 import { TagPercentageChart } from "../component/TagPercentageChart";
 import { WeekPicker } from "../component/WeekPicker";
@@ -79,6 +81,7 @@ export default function Home() {
     setSelectedCalendar([]);
 
     setWeekTotal([]);
+    setTagsInfo([]);
     setTagPercentage([]);
   };
 
@@ -114,17 +117,9 @@ export default function Home() {
     <Layout>
       <Script src="https://apis.google.com/js/api.js" onLoad={initGapi} />
 
-      <div>
-        {isSignedIn ? (
-          <div>
-            <div>{fb.auth().currentUser?.displayName}</div>
-            <button onClick={signOut}>Sign-out</button>
-          </div>
-        ) : (
-          <button onClick={signIn}>sign in</button>
-        )}
-      </div>
+      <AuthButton isSignedIn={isSignedIn} signIn={signIn} signOut={signOut} />
 
+      <div>Calendars</div>
       <CheckboxGroup
         data={calendarsInfo}
         selected={selectedCalendar}
@@ -136,19 +131,19 @@ export default function Home() {
         onChange={(date) => setWeekRange(getWeekRange(date))}
       />
 
-      <br />
-      <button onClick={getCalendar}>get calendar</button>
-      <br />
+      <RefreshButton onClick={getCalendar} />
+      <div>Tags</div>
       <CheckboxGroup
-        data={tagsInfo.map(({ title }) => ({ title, id: title }))}
+        data={tagsInfo.map(({ title, color }) => ({ title, id: title, color }))}
         selected={selectedTags}
         onChange={setselectedTags}
       />
-      <br />
-      <Label>Weekly Hours</Label>
+
+      <div>Weekly Hours</div>
       <WeekTotalChart
         data={weekTotal.filter((wt) => selectedTags.includes(wt.tag.title))}
       />
+      <div>Weekly Percentage</div>
       <TagPercentageChart
         data={tagPercentage.filter((wt) => selectedTags.includes(wt.tag.title))}
       />
@@ -162,10 +157,3 @@ const Layout = styled.div`
   padding: 60px;
   box-sizing: border-box;
 `;
-
-// Typography
-const H1 = styled.h1``;
-const H2 = styled.h2``;
-const H3 = styled.h3``;
-const Label = styled.span``;
-const p = styled.h3``;
