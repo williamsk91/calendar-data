@@ -1,13 +1,13 @@
 import { Select, Tag } from "antd";
 
-export interface DataInfo {
+export interface CheckboxDataInfo {
   id: string;
   title: string;
   color: string;
 }
 
 interface Props {
-  data: DataInfo[];
+  data: CheckboxDataInfo[];
   selected: string[];
   onChange: (checkedValue: string[]) => void;
 }

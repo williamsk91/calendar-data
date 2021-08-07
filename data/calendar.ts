@@ -1,9 +1,15 @@
 import { differenceInMinutes } from "date-fns";
 
+import { CheckboxDataInfo } from "../component/CheckboxGroup";
 import { Tag } from "../component/Tag";
 
 export type GEvent = gapi.client.calendar.Event;
-type GCalendarListEntry = gapi.client.calendar.CalendarListEntry;
+export type GCalendarListEntry = gapi.client.calendar.CalendarListEntry;
+
+interface CalendarListEvent {
+  calendar: GCalendarListEntry;
+  events: GEvent[];
+}
 
 // ------------------------- API -------------------------
 
@@ -13,23 +19,26 @@ export const getCalendarLists = async () => {
 };
 
 export const getMultipleRangeEvents = async (
-  ids: string[],
+  calendars: GCalendarListEntry[],
   from: Date,
   to: Date
-): Promise<GEvent[]> => {
+): Promise<CalendarListEvent[]> => {
   const responses = await Promise.all(
-    ids.map((id) => getRangeEvents(id, from, to))
+    calendars.map(async (c) => {
+      const events = await getRangeEvents(c, from, to);
+      return { calendar: c, events };
+    })
   );
-  return responses.flatMap((res) => res);
+  return responses;
 };
 
 export const getRangeEvents = async (
-  id: string,
+  calendar: GCalendarListEntry,
   from: Date,
   to: Date
 ): Promise<GEvent[]> => {
   const res = await gapi.client.calendar.events.list({
-    calendarId: id,
+    calendarId: calendar.id,
     timeMin: from.toISOString(),
     timeMax: to.toISOString(),
     showDeleted: false,
@@ -98,12 +107,20 @@ const GOOLGE_CALENDAR_EVENT_COLORS: Record<string, COLOR> = {
   },
 };
 
-const colorIdToEventColor = (googleColorId?: string): string =>
-  GOOLGE_CALENDAR_EVENT_COLORS[googleColorId || "1"].background;
+const colorIdToEventColor = (
+  defaultColor: string,
+  googleColorId?: string
+): string =>
+  googleColorId
+    ? GOOLGE_CALENDAR_EVENT_COLORS[googleColorId].background
+    : defaultColor;
 
 // ------------------------- Tag -------------------------
 
-const extractTag = (event: GEvent): Tag | undefined => {
+const extractTag = (
+  calendar: GCalendarListEntry,
+  event: GEvent
+): Tag | undefined => {
   const tagRegex = /^#([\w-]{0,16})/;
   const tagCandidate = event.description?.match(tagRegex);
 
@@ -111,7 +128,10 @@ const extractTag = (event: GEvent): Tag | undefined => {
   const tag = tagCandidate[1];
   if (!tag) return undefined;
 
-  const color = colorIdToEventColor(event.colorId);
+  const color = colorIdToEventColor(
+    calendar.backgroundColor as string,
+    event.colorId
+  );
 
   return {
     title: tag,
@@ -121,15 +141,9 @@ const extractTag = (event: GEvent): Tag | undefined => {
 
 // ------------------------- Processing -------------------------
 
-export interface CalendarInfo {
-  id: string;
-  title: string;
-  color: string;
-}
-
-export const calendarListEntryToCalendar = (
+export const calendarListToCheckboxDataInfo = (
   calendarListEntry: GCalendarListEntry
-): CalendarInfo => {
+): CheckboxDataInfo => {
   const { id, summary, backgroundColor } = calendarListEntry;
   return {
     id,
@@ -153,24 +167,28 @@ export interface WeekTotal {
   total: number;
 }
 
-export const eventsToWeekTotal = (events: GEvent[]): WeekTotal[] => {
+export const eventsToWeekTotal = (
+  calendarListEvents: CalendarListEvent[]
+): WeekTotal[] => {
   const bins: Record<string, WeekTotal> = {};
 
-  events.forEach((e) => {
-    const tag = extractTag(e);
-    if (!tag) return;
-    const duration = calcDuration(e);
-    const key = isRecurring(e) ? "recurring" : "oneOff";
+  calendarListEvents.forEach((cle) => {
+    cle.events.forEach((e) => {
+      const tag = extractTag(cle.calendar, e);
+      if (!tag) return;
+      const duration = calcDuration(e);
+      const key = isRecurring(e) ? "recurring" : "oneOff";
 
-    if (!bins[tag.title]) {
-      bins[tag.title] = {
-        tag,
-        recurring: 0,
-        oneOff: 0,
-        total: 0,
-      };
-    }
-    bins[tag.title][key] += duration;
+      if (!bins[tag.title]) {
+        bins[tag.title] = {
+          tag,
+          recurring: 0,
+          oneOff: 0,
+          total: 0,
+        };
+      }
+      bins[tag.title][key] += duration;
+    });
   });
 
   return Object.entries(bins)

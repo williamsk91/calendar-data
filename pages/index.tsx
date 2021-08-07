@@ -10,10 +10,10 @@ import { TagPercentageChart } from "../component/TagPercentageChart";
 import { WeekPicker } from "../component/WeekPicker";
 import { WeekTotalChart } from "../component/WeekTotalChart";
 import {
-  CalendarInfo,
+  GCalendarListEntry,
   TagPercentage,
   WeekTotal,
-  calendarListEntryToCalendar,
+  calendarListToCheckboxDataInfo,
   eventsToWeekTotal,
   getCalendarLists,
   getMultipleRangeEvents,
@@ -27,8 +27,10 @@ export default function Home() {
 
   const [weekRange, setWeekRange] = useState(getWeekRange());
 
-  const [calendarsInfo, setCalendarsInfo] = useState<CalendarInfo[]>([]);
-  const [selectedCalendar, setSelectedCalendar] = useState<string[]>([]);
+  const [calendarLists, setCalendarLists] = useState<GCalendarListEntry[]>([]);
+  const [selectedCalendarLists, setSelectedCalendarLists] = useState<
+    GCalendarListEntry[]
+  >([]);
 
   const [tagsInfo, setTagsInfo] = useState<Tag[]>([]);
   const [selectedTags, setselectedTags] = useState<string[]>([]);
@@ -77,8 +79,8 @@ export default function Home() {
     const googleAuth = gapi.auth2.getAuthInstance();
     await googleAuth.signOut();
     setIsSignedIn(false);
-    setCalendarsInfo([]);
-    setSelectedCalendar([]);
+    setCalendarLists([]);
+    setSelectedCalendarLists([]);
 
     setWeekTotal([]);
     setTagsInfo([]);
@@ -90,14 +92,13 @@ export default function Home() {
 
   const getUserCalendarList = async () => {
     const calList = await getCalendarLists();
-    const calInfos = calList.map(calendarListEntryToCalendar);
-    setCalendarsInfo(calInfos);
-    setSelectedCalendar(calInfos.map((ci) => ci.id));
+    setCalendarLists(calList);
+    setSelectedCalendarLists(calList);
   };
 
   const getCalendar = async () => {
     const events = await getMultipleRangeEvents(
-      selectedCalendar,
+      selectedCalendarLists,
       weekRange[0],
       weekRange[1]
     );
@@ -121,9 +122,16 @@ export default function Home() {
 
       <div>Calendars</div>
       <CheckboxGroup
-        data={calendarsInfo}
-        selected={selectedCalendar}
-        onChange={setSelectedCalendar}
+        data={calendarLists.map(calendarListToCheckboxDataInfo)}
+        selected={selectedCalendarLists
+          .map(calendarListToCheckboxDataInfo)
+          .map((cdi) => cdi.id)}
+        onChange={(ids) => {
+          const newSelectedCalendarLists = ids
+            .map((id) => calendarLists.find((cl) => cl.id === id))
+            .filter((cl) => cl) as GCalendarListEntry[];
+          setSelectedCalendarLists(newSelectedCalendarLists);
+        }}
       />
 
       <WeekPicker
