@@ -16,22 +16,24 @@ export const TagPercentageChart = (props: Props) => {
   const keys = Object.keys(parsedData);
 
   return (
-    <div style={{ height: "62px" }}>
-      <ResponsiveBar
-        data={[parsedData] as unknown as BarDatum[]}
-        keys={keys}
-        colors={data.map((d) => d.tag.color)}
-        colorBy="id"
-        layout="horizontal"
-        enableGridY={false}
-        labelSkipWidth={25}
-        padding={0.1}
-        innerPadding={1}
-        borderRadius={3}
-        axisBottom={{ tickSize: 0, format: () => "" }}
-        axisLeft={{ tickSize: 0 }}
-        theme={chartTheme}
-      />
+    <div>
+      <div style={{ height: "62px" }}>
+        <ResponsiveBar
+          data={[parsedData] as unknown as BarDatum[]}
+          keys={keys}
+          colors={data.map((d) => d.tag.color)}
+          colorBy="id"
+          layout="horizontal"
+          enableGridY={false}
+          labelSkipWidth={25}
+          padding={0.1}
+          innerPadding={1}
+          borderRadius={3}
+          axisBottom={{ tickSize: 0, format: () => "" }}
+          axisLeft={{ tickSize: 0 }}
+          theme={chartTheme}
+        />
+      </div>
       <BadgeContainer>
         {data.map((d) => (
           <StyledBadge
@@ -70,6 +72,7 @@ const StyledBadge = styled(Badge)`
 
   .ant-badge-status-text {
     font-size: 24px;
+    color: rgba(0, 0, 0, 0.6);
   }
 
   .ant-badge-status-dot {

@@ -12,22 +12,17 @@ export const AuthButton = (props: Props) => {
   return (
     <div>
       {isSignedIn ? (
-        <Button
-          icon={<LogoutOutlined />}
-          type="text"
-          shape="round"
-          onClick={signOut}
-        >
+        <Button icon={<LogoutOutlined />} shape="round" onClick={signOut}>
           sign out
         </Button>
       ) : (
         <Button
           icon={<LoginOutlined />}
-          type="text"
+          type="primary"
           shape="round"
           onClick={signIn}
         >
-          sign out
+          sign in
         </Button>
       )}
     </div>
