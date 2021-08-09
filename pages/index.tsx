@@ -1,5 +1,5 @@
 import Script from "next/script";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 
 import { AuthButton } from "../component/AuthButton";
@@ -40,15 +40,16 @@ export default function Home() {
   const [weekTotal, setWeekTotal] = useState<WeekTotal[]>([]);
   const [tagPercentage, setTagPercentage] = useState<TagPercentage[]>([]);
 
-  const getUserCalendarList = async () => {
+  const getUserCalendarList = async (): Promise<GCalendarListEntry[]> => {
     const calList = await getCalendarLists();
     setCalendarLists(calList);
     setSelectedCalendarLists(calList);
+    return calList;
   };
 
-  const getCalendarEvents = useCallback(async () => {
+  const getCalendarEvents = async (scls: GCalendarListEntry[]) => {
     const events = await getMultipleRangeEvents(
-      selectedCalendarLists,
+      scls,
       weekRange[0],
       weekRange[1]
     );
@@ -62,16 +63,7 @@ export default function Home() {
 
     const tagPercentage = weekTotalToTagPercentage(weekTotal);
     setTagPercentage(tagPercentage);
-  }, [weekRange, selectedCalendarLists]);
-
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      await getUserCalendarList();
-      await getCalendarEvents();
-    };
-
-    isSignedIn && fetchInitialData();
-  }, [isSignedIn, getCalendarEvents]);
+  };
 
   // 1. Load the JavaScript client library.
   const initGapi = () => {
@@ -88,9 +80,14 @@ export default function Home() {
         scope: "https://www.googleapis.com/auth/calendar.readonly",
       });
 
-      gapi.client.load("calendar", "v3", () => {
+      gapi.client.load("calendar", "v3", async () => {
         const GoogleAuth = gapi.auth2.getAuthInstance();
-        setIsSignedIn(GoogleAuth.isSignedIn.get());
+        const signedIn = GoogleAuth.isSignedIn.get();
+        if (signedIn) {
+          setIsSignedIn(signedIn);
+          const scls = await getUserCalendarList();
+          getCalendarEvents(scls);
+        }
       });
     });
   };
@@ -105,6 +102,8 @@ export default function Home() {
     await fb.auth().signInWithCredential(credential);
 
     setIsSignedIn(true);
+    const scls = await getUserCalendarList();
+    getCalendarEvents(scls);
   };
 
   const signOut = async () => {
@@ -151,7 +150,11 @@ export default function Home() {
           week={weekRange[0]}
           onChange={(date) => setWeekRange(getWeekRange(date))}
         />
-        {isSignedIn && <RefreshButton onClick={getCalendarEvents} />}
+        {isSignedIn && (
+          <RefreshButton
+            onClick={() => getCalendarEvents(selectedCalendarLists)}
+          />
+        )}
       </SpreadLayout>
 
       <Spacer size="24" />
@@ -169,13 +172,21 @@ export default function Home() {
       <Spacer size="24" />
       <H2>Weekly Hours</H2>
       <WeekTotalChart
-        data={weekTotal.filter((wt) => selectedTags.includes(wt.tag.title))}
+        data={weekTotal.filter(
+          (wt) =>
+            selectedCalendarLists.some((scl) => scl.id === wt.calendar.id) &&
+            selectedTags.includes(wt.tag.title)
+        )}
       />
 
       <Spacer size="24" />
       <H2>Weekly Percentage</H2>
       <TagPercentageChart
-        data={tagPercentage.filter((wt) => selectedTags.includes(wt.tag.title))}
+        data={tagPercentage.filter(
+          (wt) =>
+            selectedCalendarLists.some((scl) => scl.id === wt.calendar.id) &&
+            selectedTags.includes(wt.tag.title)
+        )}
       />
 
       <Spacer size="60" />

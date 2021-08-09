@@ -161,6 +161,7 @@ const calcDuration = (event: GEvent): number =>
 const isRecurring = (event: GEvent): boolean => !!event.recurringEventId;
 
 export interface WeekTotal {
+  calendar: GCalendarListEntry;
   tag: Tag;
   recurring: number;
   oneOff: number;
@@ -181,6 +182,7 @@ export const eventsToWeekTotal = (
 
       if (!bins[tag.title]) {
         bins[tag.title] = {
+          calendar: cle.calendar,
           tag,
           recurring: 0,
           oneOff: 0,
@@ -200,6 +202,7 @@ export const eventsToWeekTotal = (
 };
 
 export interface TagPercentage {
+  calendar: GCalendarListEntry;
   tag: Tag;
   total: number;
 }
@@ -208,5 +211,5 @@ export const weekTotalToTagPercentage = (
   weekTotal: WeekTotal[]
 ): TagPercentage[] =>
   weekTotal
-    .map(({ tag, total }) => ({ tag, total }))
+    .map(({ calendar, tag, total }) => ({ calendar, tag, total }))
     .sort((a, b) => b.total - a.total);
