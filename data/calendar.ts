@@ -117,12 +117,13 @@ const colorIdToEventColor = (
 
 // ------------------------- Tag -------------------------
 
+const TAG_REGEX = /^#([^\s<]{1,16})/;
+
 const extractTag = (
   calendar: GCalendarListEntry,
   event: GEvent
 ): Tag | undefined => {
-  const tagRegex = /^#([\w-]{0,16})/;
-  const tagCandidate = event.description?.match(tagRegex);
+  const tagCandidate = event.description?.match(TAG_REGEX);
 
   if (!tagCandidate) return undefined;
   const tag = tagCandidate[1];
