@@ -1,6 +1,7 @@
 import { BarDatum, ResponsiveBar } from "@nivo/bar";
 
 import { WeekTotal } from "../data/calendar";
+import { BarTooltip } from "./BarTooltip";
 import { chartTheme } from "./chart";
 
 interface Props {
@@ -32,6 +33,9 @@ export const WeekTotalChart = (props: Props) => {
           format: (v) => "#" + v,
         }}
         theme={chartTheme}
+        tooltip={(data) => (
+          <BarTooltip title={(data.data.tag as any).title} value={data.value} />
+        )}
       />
     </div>
   );

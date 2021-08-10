@@ -3,6 +3,7 @@ import { Badge } from "antd";
 import styled from "styled-components";
 
 import { TagPercentage } from "../data/calendar";
+import { BarTooltip } from "./BarTooltip";
 import { chartTheme } from "./chart";
 
 interface Props {
@@ -32,6 +33,7 @@ export const TagPercentageChart = (props: Props) => {
           axisBottom={{ tickSize: 0, format: () => "" }}
           axisLeft={{ tickSize: 0 }}
           theme={chartTheme}
+          tooltip={(data) => <BarTooltip title={data.id} value={data.value} />}
         />
       </div>
       <BadgeContainer>
