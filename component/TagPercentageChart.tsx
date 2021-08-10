@@ -65,6 +65,10 @@ const BadgeContainer = styled.div`
   padding: 0 120px;
   display: flex;
   flex-wrap: wrap;
+
+  @media (max-width: 800px) {
+    padding: 0 24px;
+  }
 `;
 
 const StyledBadge = styled(Badge)`
