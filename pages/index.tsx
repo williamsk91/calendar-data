@@ -7,6 +7,7 @@ import { CheckboxGroup } from "../component/CheckboxGroup";
 import { RefreshButton } from "../component/RefreshButton";
 import { Spacer } from "../component/Spacer";
 import { Tag } from "../component/Tag";
+import { TagExplanation } from "../component/TagExplanation";
 import { TagPercentageChart } from "../component/TagPercentageChart";
 import { H2 } from "../component/Typography";
 import { WeekPicker } from "../component/WeekPicker";
@@ -178,7 +179,10 @@ export default function Home() {
       )}
 
       <Spacer size="24" />
-      <H2>Tags</H2>
+      <TagTitle>
+        <H2>Tags</H2>
+        <TagExplanation hasTags={tagsInfo.length > 0} />
+      </TagTitle>
       <CheckboxGroup
         data={tagsInfo.map(({ title, color }) => ({
           title,
@@ -230,4 +234,10 @@ const SpreadLayout = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+`;
+
+const TagTitle = styled.div`
+  display: flex;
+  align-items: baseline;
+  gap: 0 12px;
 `;
