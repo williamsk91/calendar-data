@@ -1,3 +1,4 @@
+import Head from "next/head";
 import Script from "next/script";
 import { useState } from "react";
 import styled from "styled-components";
@@ -141,6 +142,9 @@ export default function Home() {
 
   return (
     <Layout>
+      <Head>
+        <title>Calendar Data</title>
+      </Head>
       <Script src="https://apis.google.com/js/api.js" onLoad={initGapi} />
 
       <Spacer size="24" />
