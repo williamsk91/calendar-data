@@ -20,8 +20,15 @@ import {
   getCalendarLists,
   getMultipleRangeEvents,
   weekTotalToTagPercentage,
+  weekTotalToTags,
 } from "../data/calendar";
 import { getWeekRange } from "../data/date";
+import {
+  getCalendarListsPlaceholder,
+  getTagPercentagePlaceholder,
+  getTagsPlaceholder,
+  getWeekTotalPlaceholder,
+} from "../data/placeholder";
 import { fb } from "../modules/auth";
 
 export default function Home() {
@@ -35,7 +42,7 @@ export default function Home() {
   >([]);
 
   const [tagsInfo, setTagsInfo] = useState<Tag[]>([]);
-  const [selectedTags, setselectedTags] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const [weekTotal, setWeekTotal] = useState<WeekTotal[]>([]);
   const [tagPercentage, setTagPercentage] = useState<TagPercentage[]>([]);
@@ -57,9 +64,9 @@ export default function Home() {
     const weekTotal = eventsToWeekTotal(events);
     setWeekTotal(weekTotal);
 
-    const tags = weekTotal.map((wt) => wt.tag);
+    const tags = weekTotalToTags(weekTotal);
     setTagsInfo(tags);
-    setselectedTags(tags.map((t) => t.title));
+    setSelectedTags(tags.map((t) => t.title));
 
     const tagPercentage = weekTotalToTagPercentage(weekTotal);
     setTagPercentage(tagPercentage);
@@ -87,6 +94,17 @@ export default function Home() {
           setIsSignedIn(signedIn);
           const scls = await getUserCalendarList();
           getCalendarEvents(scls);
+        } else {
+          // set up placeholders
+          const calPlaceholder = getCalendarListsPlaceholder();
+          setCalendarLists(calPlaceholder);
+          setSelectedCalendarLists(calPlaceholder);
+          const tagsPlaceholder = getTagsPlaceholder();
+          setTagsInfo(tagsPlaceholder);
+          setSelectedTags(tagsPlaceholder.map((t) => t.title));
+
+          setWeekTotal(getWeekTotalPlaceholder());
+          setTagPercentage(getTagPercentagePlaceholder());
         }
       });
     });
@@ -114,7 +132,7 @@ export default function Home() {
     setCalendarLists([]);
     setSelectedCalendarLists([]);
     setTagsInfo([]);
-    setselectedTags([]);
+    setSelectedTags([]);
 
     setWeekTotal([]);
     setTagPercentage([]);
@@ -143,19 +161,21 @@ export default function Home() {
         }}
       />
 
-      <Spacer size="24" />
-      <H2>Select Week</H2>
-      <SpreadLayout>
-        <WeekPicker
-          week={weekRange[0]}
-          onChange={(date) => setWeekRange(getWeekRange(date))}
-        />
-        {isSignedIn && (
-          <RefreshButton
-            onClick={() => getCalendarEvents(selectedCalendarLists)}
-          />
-        )}
-      </SpreadLayout>
+      {isSignedIn && (
+        <>
+          <Spacer size="24" />
+          <H2>Select Week</H2>
+          <SpreadLayout>
+            <WeekPicker
+              week={weekRange[0]}
+              onChange={(date) => setWeekRange(getWeekRange(date))}
+            />
+            <RefreshButton
+              onClick={() => getCalendarEvents(selectedCalendarLists)}
+            />
+          </SpreadLayout>
+        </>
+      )}
 
       <Spacer size="24" />
       <H2>Tags</H2>
@@ -166,7 +186,7 @@ export default function Home() {
           color,
         }))}
         selected={selectedTags}
-        onChange={setselectedTags}
+        onChange={setSelectedTags}
       />
 
       <Spacer size="24" />

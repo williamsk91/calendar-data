@@ -6,7 +6,7 @@ import { Tag } from "../component/Tag";
 export type GEvent = gapi.client.calendar.Event;
 export type GCalendarListEntry = gapi.client.calendar.CalendarListEntry;
 
-interface CalendarListEvent {
+export interface CalendarListEvent {
   calendar: GCalendarListEntry;
   events: GEvent[];
 }
@@ -201,6 +201,9 @@ export const eventsToWeekTotal = (
     }))
     .sort((a, b) => a.total - b.total);
 };
+
+export const weekTotalToTags = (weekTotal: WeekTotal[]): Tag[] =>
+  weekTotal.map((wt) => wt.tag);
 
 export interface TagPercentage {
   calendar: GCalendarListEntry;
