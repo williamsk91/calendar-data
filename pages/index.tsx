@@ -148,6 +148,13 @@ export default function Home() {
       <Script src="https://apis.google.com/js/api.js" onLoad={initGapi} />
 
       <Spacer size="24" />
+      <H2>About</H2>
+      <pre>
+        Weekly data visualization for Google Calendar. Set <b>#tags</b> in
+        Google Calendar event&apos;s description.
+      </pre>
+
+      <Spacer size="24" />
       <SpreadLayout>
         <H2>Calendars</H2>
         <AuthButton isSignedIn={isSignedIn} signIn={signIn} signOut={signOut} />
@@ -218,8 +225,10 @@ export default function Home() {
             selectedTags.includes(wt.tag.title)
         )}
       />
+      <Spacer size="48" />
 
-      <Spacer size="60" />
+      <pre style={{ textAlign: "center" }}>Made with &lt;3 by Williams K</pre>
+      <Spacer size="12" />
     </Layout>
   );
 }
