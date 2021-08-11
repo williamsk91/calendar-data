@@ -149,10 +149,15 @@ export default function Home() {
 
       <Spacer size="24" />
       <H2>About</H2>
-      <pre>
+      <About>
         Weekly data visualization for Google Calendar. Set <b>#tags</b> in
         Google Calendar event&apos;s description.
-      </pre>
+      </About>
+      <About>
+        All Google Calendar data is <b>read only </b>
+        and no changes to the calendar will be made. Data is also not saved
+        anywhere.
+      </About>
 
       <Spacer size="24" />
       <SpreadLayout>
@@ -246,6 +251,11 @@ const Layout = styled.div`
     margin: 0;
     padding: 12px 24px;
   }
+`;
+
+const About = styled.pre`
+  word-wrap: break-word;
+  white-space: pre-wrap;
 `;
 
 const SpreadLayout = styled.div`
