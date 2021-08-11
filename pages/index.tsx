@@ -231,10 +231,11 @@ const Layout = styled.div`
   box-sizing: border-box;
   background: #f6f9fc;
   border-radius: 4px;
+  min-height: 100vh;
 
   @media (max-width: 800px) {
-    margin: 12px auto;
-    padding: 12px;
+    margin: 0;
+    padding: 12px 24px;
   }
 `;
 
