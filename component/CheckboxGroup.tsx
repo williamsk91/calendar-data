@@ -47,8 +47,6 @@ export const CheckboxGroup = (props: Props) => {
       onChange={(newValue) => onChange(newValue as string[])}
       mode="multiple"
       tagRender={tagRender}
-      size="large"
-      bordered={false}
       style={{ display: "block" }}
     />
   );

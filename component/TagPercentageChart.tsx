@@ -34,6 +34,25 @@ export const TagPercentageChart = (props: Props) => {
           axisLeft={{ tickSize: 0 }}
           theme={chartTheme}
           tooltip={(data) => <BarTooltip title={data.id} value={data.value} />}
+          defs={[
+            {
+              id: "lines",
+              type: "patternLines",
+              background: "white",
+              color: "lightblue",
+              rotation: -40,
+              lineWidth: 2,
+              spacing: 7,
+            },
+          ]}
+          fill={[
+            {
+              match: {
+                id: "unscheduled",
+              },
+              id: "lines",
+            },
+          ]}
         />
       </div>
       <BadgeContainer>
@@ -60,6 +79,12 @@ const tagPercentageToData = (tagPercentage: TagPercentage[]): Data => {
     data[tp.tag.title] = ((tp.total / weeklyHourSum) * 100).toFixed(0);
   });
 
+  const scheduledSum = tagPercentage.reduce((sum, t) => (sum += t.total), 0);
+  data.unscheduled = (
+    ((weeklyHourSum - scheduledSum) / weeklyHourSum) *
+    100
+  ).toFixed(0);
+
   return data;
 };
 
@@ -77,7 +102,7 @@ const StyledBadge = styled(Badge)`
   width: 50%;
 
   .ant-badge-status-text {
-    font-size: 24px;
+    font-size: 22px;
     color: rgba(0, 0, 0, 0.6);
   }
 

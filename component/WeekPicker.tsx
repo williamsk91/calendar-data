@@ -22,7 +22,7 @@ export const WeekPicker = (props: Props) => {
         onChange(date?.toDate() ?? new Date());
       }}
       allowClear={false}
-      bordered={false}
+      format="YYYY wo [week]"
     />
   );
 };

@@ -152,7 +152,7 @@ export default function Home() {
         <H2>Calendars</H2>
         <AuthButton isSignedIn={isSignedIn} signIn={signIn} signOut={signOut} />
       </SpreadLayout>
-
+      <Spacer size="12" />
       <CheckboxGroup
         data={calendarLists.map(calendarListToCheckboxDataInfo)}
         selected={selectedCalendarLists
@@ -170,6 +170,7 @@ export default function Home() {
         <>
           <Spacer size="24" />
           <H2>Select Week</H2>
+          <Spacer size="6" />
           <SpreadLayout>
             <WeekPicker
               week={weekRange[0]}
@@ -187,6 +188,7 @@ export default function Home() {
         <H2>Tags</H2>
         <TagExplanation hasTags={tagsInfo.length > 0} />
       </TagTitle>
+      <Spacer size="12" />
       <CheckboxGroup
         data={tagsInfo.map(({ title, color }) => ({
           title,
@@ -227,6 +229,8 @@ const Layout = styled.div`
   margin: 60px auto;
   padding: 60px;
   box-sizing: border-box;
+  background: #f6f9fc;
+  border-radius: 4px;
 
   @media (max-width: 800px) {
     margin: 12px auto;
