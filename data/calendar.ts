@@ -190,7 +190,7 @@ export const eventsToWeekTotal = (
           total: 0,
         };
       }
-      bins[tag.title][key] += duration;
+      bins[tag.title][key] += +duration.toFixed(2);
     });
   });
 
